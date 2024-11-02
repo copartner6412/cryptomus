@@ -58,7 +58,7 @@ type LimitOrderRequest struct {
 //		}
 //	}
 func (u *User) CreateLimitOrder(request MarketOrderRequest) (*MarketOrder, error) {
-	httpResponse, err := u.sendPaymentRequest("POST", urlCreateLimitOrder, struct{}{})
+	httpResponse, err := u.sendPaymentRequest("POST", urlCreateLimitOrder, request)
 	if err != nil {
 		return nil, err
 	}
@@ -95,7 +95,7 @@ func (u *User) CreateLimitOrder(request MarketOrderRequest) (*MarketOrder, error
 	errs = append(errs, response.Errors.Price...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error creating limit order with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

@@ -25,6 +25,8 @@ type QRCodeForStaticWalletRequest struct {
 //
 // See "Generate a QR-code" https://doc.cryptomus.com/business/payments/qr-code-pay-form
 //
+// # Request example
+//
 //	{
 //	    "merchant_payment_uuid": "8b03432e-385b-4670-8d06-064591096795",
 //	}
@@ -51,6 +53,15 @@ type QRCodeResponse struct {
 // GenerateQRCodeForStaticWallet is a payment method that generates a QR-code for a static wallet address. Scanning it, the user will receive the address for depositing funds.
 //
 // See "Generate a QR-code" https://doc.cryptomus.com/business/payments/qr-code-pay-form
+//
+// # Response example
+//
+//	{
+//	    "state": 0,
+//	    "result": {
+//	        "image": "data:image/png;base64,iVBORw0KGgoAAA..."
+//		}
+//	}
 func (m *Merchant) GenerateQRCodeForStaticWallet(request QRCodeForStaticWalletRequest) (*QRCodeResponse, error) {
 	httpResponse, err := m.sendPaymentRequest("POST", urlGenerateQRCodeForStaticWallet, request)
 	if err != nil {
@@ -62,8 +73,7 @@ func (m *Merchant) GenerateQRCodeForStaticWallet(request QRCodeForStaticWalletRe
 		State   int            `json:"state"`
 		Result  QRCodeResponse `json:"result"`
 		Message string         `json:"message"`
-		// If some parameter is required and not passed
-		Errors struct {
+		Errors  struct {
 			WalletAddressUUID []string `json:"wallet_address_uuid"`
 		} `json:"errors"`
 		Code  int    `json:"code"`
@@ -74,17 +84,16 @@ func (m *Merchant) GenerateQRCodeForStaticWallet(request QRCodeForStaticWalletRe
 	}
 
 	var errs []string
-	if httpResponse.StatusCode != http.StatusOK || response.State != 0 {
-		if response.Message != "" {
-			errs = append(errs, response.Message)
-		}
-		errs = append(errs, response.Errors.WalletAddressUUID...)
-		if response.Error != "" {
-			errs = append(errs, response.Error)
-		}
+	if response.Message != "" {
+		errs = append(errs, response.Message)
 	}
-	if len(errs) > 0 {
-		return nil, fmt.Errorf("error creating QR code for static wallet with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+	errs = append(errs, response.Errors.WalletAddressUUID...)
+	if response.Error != "" {
+		errs = append(errs, response.Error)
+	}
+
+	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil
@@ -93,8 +102,17 @@ func (m *Merchant) GenerateQRCodeForStaticWallet(request QRCodeForStaticWalletRe
 // GenerateQRCodeForInvoice is a payment method that generates a QR-code for an invoice address. Scanning it, the user will receive the address for depositing funds.
 //
 // See "Generate a QR-code" https://doc.cryptomus.com/business/payments/qr-code-pay-form
+//
+// # Response example
+//
+//	{
+//	    "state": 0,
+//	    "result": {
+//	        "image": "data:image/png;base64,iVBORw0KGgoAAA..."
+//		}
+//	}
 func (m *Merchant) GenerateQRCodeForInvoice(request QRCodeForInvoiceRequest) (*QRCodeResponse, error) {
-	httpResponse, err := m.sendPaymentRequest("POST", urlGenerateQRCodeForStaticWallet, request)
+	httpResponse, err := m.sendPaymentRequest("POST", urlGenerateQRCodeForInvoice, request)
 	if err != nil {
 		return nil, err
 	}
@@ -125,7 +143,7 @@ func (m *Merchant) GenerateQRCodeForInvoice(request QRCodeForInvoiceRequest) (*Q
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error creating QR code for invoice with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

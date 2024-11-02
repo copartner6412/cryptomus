@@ -17,6 +17,25 @@ import (
 //
 // See "Creating a payout" https://doc.cryptomus.com/business/payouts/creating-payout
 //
+// # Response example
+//
+//	{
+//	    "state": 0,
+//	    "result": {
+//	        "uuid": "a7c0caec-a594-4aaa-b1c4-77d511857594",
+//	        "amount": "3",
+//	        "currency": "USDT",
+//	        "network": "TRON",
+//	        "address": "TJ...",
+//	        "txid": null,
+//	        "status": "process",
+//	        "is_final": false,
+//	        "balance": 129,
+//	        "payer_currency": "USD",
+//	        "payer_amount": 3
+//	    }
+//	}
+//
 // # Possible errors
 //
 // # Validation errors
@@ -135,7 +154,7 @@ import (
 //		"error": null
 //	}
 func (m *Merchant) CreatePayout(request Withdrawal) (*Payout, error) {
-	httpResponse, err := m.sendPaymentRequest("POST", urlCreateStaticWallet, request)
+	httpResponse, err := m.sendPayoutRequest("POST", urlCreatePayout, request)
 	if err != nil {
 		return nil, err
 	}
@@ -177,7 +196,7 @@ func (m *Merchant) CreatePayout(request Withdrawal) (*Payout, error) {
 	errs = append(errs, response.Errors.Network...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error creating payout with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

@@ -50,6 +50,16 @@ type BlockStaticWalletResponse struct {
 //
 // See "Block static wallet" https://doc.cryptomus.com/business/payments/block-wallet
 //
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"uuid": "fcc40793-39f9-4fa9-85b2-93148039a72b",
+//			"status": "blocked"
+//		}
+//	}
+//
 // # Possible errors
 //
 // # Validation errors
@@ -89,8 +99,7 @@ func (m *Merchant) BlockStaticWallet(request BlockStaticWalletRequest) (*BlockSt
 		Result  BlockStaticWalletResponse `json:"result"`
 		Message string                    `json:"message"`
 		Errors  struct {
-			UUID    []string `json:"uuid"`
-			OrderID []string `json:"order_id"`
+			IsForceRefund []string `json:"is_force_refund"`
 		} `json:"errors"`
 		Code  int    `json:"code"`
 		Error string `json:"error"`
@@ -106,11 +115,10 @@ func (m *Merchant) BlockStaticWallet(request BlockStaticWalletRequest) (*BlockSt
 	if response.Error != "" {
 		errs = append(errs, response.Error)
 	}
-	errs = append(errs, response.Errors.UUID...)
-	errs = append(errs, response.Errors.OrderID...)
+	errs = append(errs, response.Errors.IsForceRefund...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error blocking static wallet with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

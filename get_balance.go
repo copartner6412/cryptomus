@@ -17,6 +17,7 @@ type MerchantWallet struct {
 	CurrencyCode string `json:"currency_code"`
 }
 
+// See "Get balance" https://doc.cryptomus.com/personal/converts/balance
 type UserWallet struct {
 	// Wallet UUID
 	WalletUUID string `json:"walletUuid"`
@@ -104,7 +105,7 @@ type UserWallet struct {
 //	    ]
 //	}
 func (m *Merchant) GetBalance() (merchantBalances, userBalances []MerchantWallet, err error) {
-	httpResponse, err := m.sendPaymentRequest("POST", urlGetBalanceForMerchant, struct{}{})
+	httpResponse, err := m.sendPaymentRequest("POST", urlGetBalanceForMerchant, nil)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -136,7 +137,7 @@ func (m *Merchant) GetBalance() (merchantBalances, userBalances []MerchantWallet
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, nil, fmt.Errorf("error getting balance with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return response.Result[0].Balance.Merchant, response.Result[0].Balance.User, nil
@@ -167,7 +168,7 @@ func (m *Merchant) GetBalance() (merchantBalances, userBalances []MerchantWallet
 //		}
 //	  }
 func (u *User) GetBalance() ([]UserWallet, error) {
-	httpResponse, err := u.sendPaymentRequest("GET", urlGetBalanceForUser, struct{}{})
+	httpResponse, err := u.sendPaymentRequest("GET", urlGetBalanceForUser, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -194,7 +195,7 @@ func (u *User) GetBalance() ([]UserWallet, error) {
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error getting balance with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return response.Result, nil

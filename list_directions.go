@@ -47,7 +47,7 @@ type Direction struct {
 //		}
 //	}
 func (u *User) ListDirections() ([]Direction, error) {
-	httpResponse, err := u.sendPaymentRequest("GET", urlListDirections, struct{}{})
+	httpResponse, err := u.sendPaymentRequest("GET", urlListDirections, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +74,7 @@ func (u *User) ListDirections() ([]Direction, error) {
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error listing directions with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return response.Result, nil

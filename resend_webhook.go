@@ -93,7 +93,7 @@ func (m *Merchant) ResendWebhook(request RecordID) error {
 	errs = append(errs, response.Errors.OrderID...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return fmt.Errorf("error resending webhook with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return nil

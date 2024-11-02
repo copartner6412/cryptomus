@@ -52,6 +52,16 @@ type RefundBlockedAddressResponse struct {
 //
 // See "Refund payments on blocked address" https://doc.cryptomus.com/business/payments/refundblocked
 //
+// # Response example
+//
+//	{
+//	    "state": 0,
+//	    "result": {
+//	        "commission": "0.50",
+//	        "amount": "9.50"
+//	    }
+//	}
+//
 // # Possible errors
 //
 // # Validation errors
@@ -178,7 +188,7 @@ func (m *Merchant) RefundBlockedAddress(request RefundBlockedAddressRequest) (*R
 	errs = append(errs, response.Errors.Address...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error refunding blocked address with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

@@ -101,7 +101,6 @@ type Invoice struct {
 	OrderID string `json:"order_id"`
 	// (Optional) Blockchain network code
 	//    default: null
-	// Optional
 	Network *string `json:"network,omitempty"`
 	// (Optional) Before paying, the user can click on the button on the payment form and return to the store page at this URL.
 	//    min: 6
@@ -165,10 +164,10 @@ type Invoice struct {
 	// The array of available currencies from your merchant's settings is used (if the parameter is not set, all supported cryptocurrencies are used by default).
 	//
 	// The available currencies are set in the merchant settings section.
-	Currencies *[]Currency `json:"currencies,omitempty"`
+	Currencies []Currency `json:"currencies,omitempty"`
 	// (Optional) List of excluded currencies for payment
 	//    default: null
-	ExceptCurrencies *[]Currency `json:"except_currencies,omitempty"`
+	ExceptCurrencies []Currency `json:"except_currencies,omitempty"`
 	// (Optional) The service from which the exchange rates are taken for conversion in the invoice.
 	//    min: 4
 	//    max: 20

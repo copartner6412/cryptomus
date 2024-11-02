@@ -32,6 +32,17 @@ type DiscountRequest struct {
 
 // See "Set discount to payment method" https://doc.cryptomus.com/business/discount/set
 //
+// # Response example
+//
+//	{
+//	    "state": 0,
+//	    "result": {
+//	      "currency": "BUSD",
+//	      "network": "bsc",
+//	      "discount": "-10"
+//	    }
+//	}
+//
 // # Possible errors
 //
 //	{
@@ -50,9 +61,9 @@ func (m *Merchant) SetDiscount(request DiscountRequest) (*Discount, error) {
 		Result  Discount `json:"result"`
 		Message string   `json:"message"`
 		Errors  struct {
-			Currency []string `json:"currency"`
-			Network  []string `json:"network"`
-			Discount []string `json:"discount"`
+			Currency        []string `json:"currency"`
+			Network         []string `json:"network"`
+			DiscountPercent []string `json:"discount_percent"`
 		} `json:"errors"`
 		Code  int    `json:"code"`
 		Error string `json:"error"`
@@ -71,10 +82,10 @@ func (m *Merchant) SetDiscount(request DiscountRequest) (*Discount, error) {
 	}
 	errs = append(errs, response.Errors.Currency...)
 	errs = append(errs, response.Errors.Network...)
-	errs = append(errs, response.Errors.Discount...)
+	errs = append(errs, response.Errors.DiscountPercent...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error setting discount with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

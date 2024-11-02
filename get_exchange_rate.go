@@ -6,9 +6,13 @@ import (
 	"net/http"
 )
 
+// See "List" https://doc.cryptomus.com/business/exchange-rates/list
 type ExchangeRate struct {
+	// From currency
 	From   string `json:"from"`
+	// To currency
 	To     string `json:"to"`
+	// Exchange rate
 	Course string `json:"course"`
 }
 
@@ -34,13 +38,13 @@ func GetExchangeRate(currency string) ([]ExchangeRate, error) {
 	}
 	defer resp.Body.Close()
 
-	var exchangeRateResponse struct {
+	var responseStruct struct {
 		State  int            `json:"state"`
 		Result []ExchangeRate `json:"result"`
 	}
-	if err := json.NewDecoder(resp.Body).Decode(&exchangeRateResponse); err != nil {
+	if err := json.NewDecoder(resp.Body).Decode(&responseStruct); err != nil {
 		return nil, err
 	}
 
-	return exchangeRateResponse.Result, nil
+	return responseStruct.Result, nil
 }

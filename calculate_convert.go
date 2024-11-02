@@ -25,10 +25,10 @@ type Convert struct {
 	To string `json:"to"`
 	// (Required) Amount to be calculated in Currency From
 	//    required_without: to_amount
-	FromAmount string `json:"from_amount"`
+	FromAmount *string `json:"from_amount,omitempty"`
 	// (Required) Amount to be calculated in Currency To
 	//    required_without: from_amount
-	ToAmount string `json:"to_amount"`
+	ToAmount *string `json:"to_amount,omitempty"`
 }
 
 // See "Calculate convert" https://doc.cryptomus.com/personal/converts/calculate
@@ -73,7 +73,7 @@ type CalculateConvertResponse struct {
 //		}
 //	}
 func (u *User) CalculateConvert(request Convert) (*CalculateConvertResponse, error) {
-	httpResponse, err := u.sendPaymentRequest("POST", urlCalculateConvert, struct{}{})
+	httpResponse, err := u.sendPaymentRequest("POST", urlCalculateConvert, request)
 	if err != nil {
 		return nil, err
 	}
@@ -110,7 +110,7 @@ func (u *User) CalculateConvert(request Convert) (*CalculateConvertResponse, err
 	errs = append(errs, response.Errors.ToAmount...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error calculating convert with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

@@ -77,6 +77,8 @@ type RecurringInvoice struct {
 //
 // To use recurring payments, you need to create a payment that specifies the amount, currency, and frequency of the payments, and then share it with your payers. The payer will be redirected to the cryptomus website, where he will need to log in to confirm the payment plan and make the first payment. After that, payments will be made automatically according to the plan.
 //
+// See "Creating recurring payment" https://doc.cryptomus.com/business/recurring/creating
+//
 // # Examples
 //
 // Request data example to create a recurrence payment for 15 USD
@@ -221,13 +223,10 @@ func (m *Merchant) CreateRecurringInvoice(request RecurringInvoice) (RecurringPa
 		Message string           `json:"message"`
 		// If some parameter is required and not passed
 		Errors struct {
-			Amount         []string `json:"amount"`
-			Currency       []string `json:"currency"`
-			Name           []string `json:"name"`
-			Period         []string `json:"period"`
-			OrderID        []string `json:"order_id"`
-			DiscountDays   []string `json:"discount_days"`
-			DiscountAmount []string `json:"discount_amount"`
+			Amount   []string `json:"amount"`
+			Currency []string `json:"currency"`
+			Name     []string `json:"name"`
+			Period   []string `json:"period"`
 		} `json:"errors"`
 		Code  int    `json:"code"`
 		Error string `json:"error"`
@@ -248,12 +247,9 @@ func (m *Merchant) CreateRecurringInvoice(request RecurringInvoice) (RecurringPa
 	errs = append(errs, response.Errors.Currency...)
 	errs = append(errs, response.Errors.Name...)
 	errs = append(errs, response.Errors.Period...)
-	errs = append(errs, response.Errors.OrderID...)
-	errs = append(errs, response.Errors.DiscountDays...)
-	errs = append(errs, response.Errors.DiscountAmount...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return RecurringPayment{}, fmt.Errorf("error creating recurring invoice with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return RecurringPayment{}, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return response.Result, nil

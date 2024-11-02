@@ -51,7 +51,6 @@ type StaticWalletRequest struct {
 	// They enter their api key and merchant id in your application, and you send requests with their credentials and passing your referral code.
 	//
 	// Thus, your clients become referrals on your Cryptomus account and you will receive income from their turnover.
-	//
 	//    default: null
 	FromReferralCode *string `json:"from_referral_code,omitempty"`
 }
@@ -93,6 +92,20 @@ type StaticWalletResponse struct {
 // All transactions sent to this address will be credited regardless of the amount.
 //
 // See "Creating a Static wallet" https://doc.cryptomus.com/business/payments/creating-static
+//
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"wallet_uuid": "de15b0f6-883f-4585-b27b-73a648044a92",
+//			"uuid": "87961ae5-80c5-413a-a4fe-d38199894940",
+//			"address": "TTEtddVZyNtLD9wbq4PzomjBhtxenSMXbb",
+//			"network": "tron",
+//			"currency": "USDT",
+//			"url": "https://pay.cryptomus.com/wallet/3901446a-4b74-4796-b50a-14e14dafe3ed"
+//		}
+//	}
 //
 // # Possible errors
 //
@@ -175,7 +188,7 @@ func (m *Merchant) CreateStaticWallet(request StaticWalletRequest) (*StaticWalle
 	errs = append(errs, response.Errors.OrderID...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error creating static wallet with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

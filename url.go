@@ -40,5 +40,5 @@ const (
 	urlCreateLimitOrder               = "https://api.cryptomus.com/v2/user-api/convert/limit"
 	urlCancelLimitOrder               = "https://api.cryptomus.com/v2/user-api/convert/%s"
 	urlListDirections                 = "https://api.cryptomus.com/v2/user-api/convert/direction-list"
-	urlListOrders                     = "https://api.cryptomus.com/v2/user-api/convert/order-list/"
+	urlListOrderHistory               = "https://api.cryptomus.com/v2/user-api/convert/order-list/"
 )

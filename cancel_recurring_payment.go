@@ -7,6 +7,31 @@ import (
 	"strings"
 )
 
+// See "Cancel recurring payment" https://doc.cryptomus.com/business/recurring/cancel
+//
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//		  "uuid": "bbe5ce96-1126-4843-a0d2-b432e77669c2",
+//		  "name": "Access to personal account",
+//		  "order_id": "1487555",
+//		  "amount": "5",
+//		  "currency": "USD",
+//		  "payer_currency": "USDT",
+//		  "payer_amount_usd": "5.00",
+//		  "payer_amount": "5.00",
+//		  "url_callback": null,
+//		  "discount_days": "30",
+//		  "discount_amount": "50.00",
+//		  "end_of_discount": null,
+//		  "period": "weekly",
+//		  "status": "wait_accept",
+//		  "url": "https://pay.cryptomus.com/pay/bbe5ce96-1126-4843-a0d2-b432e77669c2",
+//		  "last_pay_off": null
+//		}
+//	}
 func (m *Merchant) CancelRecurringPayment(request RecordID) (*RecurringPayment, error) {
 	httpResponse, err := m.sendPaymentRequest("POST", urlCancelRecurringPayment, request)
 	if err != nil {
@@ -41,7 +66,7 @@ func (m *Merchant) CancelRecurringPayment(request RecordID) (*RecurringPayment, 
 	errs = append(errs, response.Errors.OrderID...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error canceling recurring payment information with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

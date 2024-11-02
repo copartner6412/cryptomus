@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// See "Get assets" https://doc.cryptomus.com/personal/market-cap/assets
 type Asset struct {
 	// Code of currency
 	CurrencyCode string `json:"currency_code"`
@@ -16,13 +17,13 @@ type Asset struct {
 	// Is possible payment
 	CanDeposit bool `json:"can_deposit"`
 	// Minimum withdraw value
-	MinWithdraw *string `json:"min_withdraw"`
+	MinWithdraw string `json:"min_withdraw"`
 	// Maximum withdraw value
-	MaxWithdraw *string `json:"max_withdraw"`
+	MaxWithdraw string `json:"max_withdraw"`
 	// Maximum deposit value
-	MaxDeposit *string `json:"max_deposit"`
+	MaxDeposit string `json:"max_deposit"`
 	// Minimum deposit value
-	MinDeposit *string `json:"min_deposit"`
+	MinDeposit string `json:"min_deposit"`
 }
 
 // See "Get assets" https://doc.cryptomus.com/personal/market-cap/assets
@@ -64,7 +65,7 @@ func GetAssets() ([]Asset, error) {
 		Result []Asset `json:"result"`
 	}
 
-	if err := json.NewDecoder(response.Body).Decode(&response); err != nil {
+	if err := json.NewDecoder(response.Body).Decode(&responseStruct); err != nil {
 		return nil, fmt.Errorf("error decoding response payload: %w", err)
 	}
 

@@ -150,7 +150,7 @@ func (m *Merchant) nextPaymentHistoryPage(currentPage *paymentHistoryResponse) (
 
 	url := urlListPaymentHistory + "?cursor=" + currentPage.Paginate.NextCursor
 
-	httpResponse, err := m.sendPaymentRequest("POST", url, struct{}{})
+	httpResponse, err := m.sendPaymentRequest("POST", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -177,13 +177,105 @@ func (m *Merchant) nextPaymentHistoryPage(currentPage *paymentHistoryResponse) (
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error retrieving next page of payment history with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil
 }
 
 // See "Payment history" https://doc.cryptomus.com/business/payments/payment-history
+//
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"items": [{
+//				"uuid": "ac1af391-8e98-4335-b9d7-7b6f6b40f268",
+//				"order_id": "20fe59c4601dd174985e497e3f6bbcd2",
+//				"amount": "20.00",
+//				"payment_amount": "0.00000000",
+//				"payer_amount": "0.00064860",
+//				"discount_percent": 0,
+//				"discount": "0.00000000",
+//				"payer_currency": "BTC",
+//				"currency": "USD",
+//				"merchant_amount": null,
+//				"comments": null,
+//				"network": "btc",
+//				"address": "bc1qxm6ehuy6mz2l2h3ag88frcjvl2xxlr9hvnq835",
+//				"from": null,
+//				"txid": null,
+//				"payment_status": "cancel",
+//				"url": "https://pay.cryptomus.com/pay/ac1af391-8e98-4335-b9d7-7b6f6b40f268",
+//				"expired_at": 1689172103,
+//				"status": "cancel",
+//				"is_final": true,
+//				"additional_data": null,
+//				"created_at": "2023-07-12T16:28:24+03:00",
+//				"updated_at": "2023-07-12T17:30:16+03:00"
+//			}, {
+//				"uuid": "1bb48358-2905-4e98-b681-5f1948e818d1",
+//				"order_id": "a3329f462eb036dad12b5409147809a3",
+//				"amount": "15.00",
+//				"payment_amount": "0.00",
+//				"payer_amount": "14.25",
+//				"discount_percent": 5,
+//				"discount": "0.75",
+//				"payer_currency": "USDT",
+//				"currency": "USDT",
+//				"merchant_amount": "15.43500000",
+//				"comments": null,
+//				"network": "tron",
+//				"address": "TSChodGNEJ6D31d9uueFxJAVH9NxiJjTwC",
+//				"from": null,
+//				"txid": null,
+//				"payment_status": "cancel",
+//				"url": "https://pay.cryptomus.com/pay/1bb48358-2905-4e98-b681-5f1948e818d1",
+//				"expired_at": 1689099958,
+//				"status": "cancel",
+//				"is_final": true,
+//				"additional_data": null,
+//				"created_at": "2023-07-11T20:25:58+03:00",
+//				"updated_at": "2023-07-11T21:26:18+03:00"
+//			}, {
+//				"uuid": "70b8db5c-b952-406d-af26-4e1c34c27f15",
+//				"order_id": "65bbe87b4098c17a31cff3e71e515243",
+//				"amount": "15.00",
+//				"payment_amount": "0.00",
+//				"payer_amount": "15.75",
+//				"discount_percent": -5,
+//				"discount": "-0.75",
+//				"payer_currency": "USDT",
+//				"currency": "USDT",
+//				"merchant_amount": "15.43500000",
+//				"comments": null,
+//				"network": "tron",
+//				"address": "TXhfYSWt2oKRrHAJVJeYRuit6ZzKuoEKXj",
+//				"from": null,
+//				"txid": null,
+//				"payment_status": "cancel",
+//				"url": "https://pay.cryptomus.com/pay/70b8db5c-b952-406d-af26-4e1c34c27f15",
+//				"expired_at": 1689099831,
+//				"status": "cancel",
+//				"is_final": true,
+//				"additional_data": null,
+//				"created_at": "2023-07-11T20:23:52+03:00",
+//				"updated_at": "2023-07-11T21:24:17+03:00"
+//			},
+//			...
+//
+// ],
+//
+//			"paginate": {
+//				"count": 15,
+//				"hasPages": true,
+//				"nextCursor": "eyJpZCI6MjkxNTU0MywiX3BvaW50c1RvTmV4dEl0ZW1zIjp0cnVlfQ",
+//				"previousCursor": null,
+//				"perPage": 15
+//			}
+//		}
+//	}
 //
 // # Possible errors
 //
@@ -236,7 +328,7 @@ func (m *Merchant) ListPaymentHistory(request HistoryRequest) ([]Invoice, error)
 		}
 	}
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error retrieving payment history with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	var invoices []Invoice
@@ -259,6 +351,8 @@ func (m *Merchant) ListPaymentHistory(request HistoryRequest) ([]Invoice, error)
 // payoutHistoryResponse represents the response structure for a payout history request.
 //
 // See "Payout history" https://doc.cryptomus.com/business/payouts/payout-history
+//
+// # Response example
 //
 //	{
 //		"state": 0,
@@ -317,7 +411,7 @@ func (m *Merchant) nextPayoutHistoryPage(currentPage *payoutHistoryResponse) (*p
 	}
 
 	url := urlListPayoutHistory + "?cursor=" + currentPage.Paginate.NextCursor
-	httpResponse, err := m.sendPaymentRequest("POST", url, struct{}{})
+	httpResponse, err := m.sendPayoutRequest("POST", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -344,7 +438,7 @@ func (m *Merchant) nextPayoutHistoryPage(currentPage *payoutHistoryResponse) (*p
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error retrieving next page of payout history with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil
@@ -352,7 +446,51 @@ func (m *Merchant) nextPayoutHistoryPage(currentPage *payoutHistoryResponse) (*p
 
 // See "Payout history" https://doc.cryptomus.com/business/payouts/payout-history
 //
-//	# Possible errors
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"items": [{
+//				"uuid": "a7c0caec-a594-4aaa-b1c4-77d511857594",
+//				"amount": "3",
+//				"currency": "USDT",
+//				"network": "TRON",
+//				"address": "TJ...",
+//				"txid": null,
+//				"status": "process",
+//				"is_final": false,
+//				"balance": "129.00000000",
+//				"created_at": "2023-06-21T17:25:55+03:00",
+//				"updated_at": "2023-06-21T17:34:38+03:00"
+//			}, {
+//				"uuid": "92c39264-d180-4503-9c16-ee16f083bbb8",
+//				"amount": "5.40000000",
+//				"currency": "DOGE",
+//				"network": "doge",
+//				"address": "DEw8CJLfxg9fhumeXP1zvVNjZicsqtDv7V",
+//				"txid": "5e5810946152ea569d2a2aa9aa32a45c0e4223a4f9aad8e31d2fc660d2cdedb8",
+//				"order_id": null,
+//				"payment_status": null,
+//				"status": "paid",
+//				"is_final": true,
+//				"balance": "26.77966652",
+//				"created_at": "2023-07-21T17:25:55+03:00",
+//				"updated_at": "2023-07-21T17:34:38+03:00"
+//			},
+//			...
+//			],
+//			"paginate": {
+//				"count": 15,
+//				"hasPages": true,
+//				"nextCursor": "eyJpZCI6MjkxNTU0MywiX3BvaW50c1RvTmV4dEl0ZW1zIjp0cnVlfQ",
+//				"previousCursor": null,
+//				"perPage": 15
+//			}
+//		}
+//	}
+//
+// # Possible errors
 //
 // # Validation errors
 //
@@ -369,7 +507,7 @@ func (m *Merchant) nextPayoutHistoryPage(currentPage *payoutHistoryResponse) (*p
 //		}
 //	}
 func (m *Merchant) ListPayoutHistory(request HistoryRequest) ([]Payout, error) {
-	httpResponse, err := m.sendPaymentRequest("POST", urlListPayoutHistory, request)
+	httpResponse, err := m.sendPayoutRequest("POST", urlListPayoutHistory, request)
 	if err != nil {
 		return nil, err
 	}
@@ -403,7 +541,7 @@ func (m *Merchant) ListPayoutHistory(request HistoryRequest) ([]Payout, error) {
 		}
 	}
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error retrieving payout history with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	var payouts []Payout
@@ -532,7 +670,7 @@ func (m *Merchant) ListRecurringPayments() ([]RecurringPayment, error) {
 		}
 	}
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error retrieving recurring payment with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	var recurringPayments []RecurringPayment
@@ -590,6 +728,65 @@ type listOrdersResponse struct {
 	Paginate paginate      `json:"Paginate"`
 }
 
+
+// Available options for type:
+//   - market
+//   - limit
+//
+// Available options for status:
+//   - active
+//   - completed
+//   - partially_completed
+//   - cancelled
+//   - expired
+//   - failed
+func (u *User) nextOrderHistoryPage(cursor, orderType, orderStatus string) (*listOrdersResponse, error) {
+	url := urlListOrderHistory
+	if cursor != "" {
+		url = url + "?cursor=" + cursor
+	}
+	if orderType != "" {
+		url = url + "?type=" + orderType
+	}
+	if orderStatus != "" {
+		url = url + "?status=" + orderStatus
+	}
+
+	httpResponse, err := u.sendPaymentRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	defer httpResponse.Body.Close()
+
+	var response = struct {
+		State   int                `json:"state"`
+		Result  listOrdersResponse `json:"result"`
+		Message string             `json:"message"`
+		Code    int                `json:"code"`
+		Error   string             `json:"error"`
+	}{}
+
+	if err := json.NewDecoder(httpResponse.Body).Decode(&response); err != nil {
+		return nil, fmt.Errorf("error decoding response: %w", err)
+	}
+
+	var errs []string
+	if response.Message != "" {
+		errs = append(errs, response.Message)
+	}
+	if response.Error != "" {
+		errs = append(errs, response.Error)
+	}
+
+	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+	}
+
+	return &response.Result, nil
+
+}
+
+
 // See "Get orders list" https://doc.cryptomus.com/personal/converts/orders-list
 //
 // # Response example
@@ -624,12 +821,12 @@ type listOrdersResponse struct {
 //	  }
 //	}
 func (u *User) ListOrderHistory(orderType, orderStatus string) ([]MarketOrder, error) {
-	url := urlListOrders
+	url := urlListOrderHistory
 	if orderType != "" {
-		url = url + fmt.Sprintf("?type=%s", orderType)
+		url = url + "?type=" + orderType
 	}
 	if orderStatus != "" {
-		url = url + fmt.Sprintf("?status=%s", orderStatus)
+		url = url + "?status=" + orderStatus
 	}
 
 	httpResponse, err := u.sendPaymentRequest("GET", url, nil)
@@ -659,7 +856,7 @@ func (u *User) ListOrderHistory(orderType, orderStatus string) ([]MarketOrder, e
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error listing market orders with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	var orders []MarketOrder
@@ -675,61 +872,4 @@ func (u *User) ListOrderHistory(orderType, orderStatus string) ([]MarketOrder, e
 		}
 	}
 	return orders, nil
-}
-
-// Available options for type:
-//   - market
-//   - limit
-//
-// Available options for status:
-//   - active
-//   - completed
-//   - partially_completed
-//   - cancelled
-//   - expired
-//   - failed
-func (u *User) nextOrderHistoryPage(cursor, orderType, orderStatus string) (*listOrdersResponse, error) {
-	url := urlListOrders
-	if cursor != "" {
-		url = url + fmt.Sprintf("?cursor=%s", cursor)
-	}
-	if orderType != "" {
-		url = url + fmt.Sprintf("?type=%s", orderType)
-	}
-	if orderStatus != "" {
-		url = url + fmt.Sprintf("?status=%s", orderStatus)
-	}
-
-	httpResponse, err := u.sendPaymentRequest("GET", url, nil)
-	if err != nil {
-		return nil, err
-	}
-	defer httpResponse.Body.Close()
-
-	var response = struct {
-		State   int                `json:"state"`
-		Result  listOrdersResponse `json:"result"`
-		Message string             `json:"message"`
-		Code    int                `json:"code"`
-		Error   string             `json:"error"`
-	}{}
-
-	if err := json.NewDecoder(httpResponse.Body).Decode(&response); err != nil {
-		return nil, fmt.Errorf("error decoding response: %w", err)
-	}
-
-	var errs []string
-	if response.Message != "" {
-		errs = append(errs, response.Message)
-	}
-	if response.Error != "" {
-		errs = append(errs, response.Error)
-	}
-
-	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
-	}
-
-	return &response.Result, nil
-
 }

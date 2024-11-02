@@ -22,6 +22,8 @@ type TransferRequest struct {
 
 // See "Transfer to personal wallet" https://doc.cryptomus.com/business/payouts/transfer-to-personal
 //
+// # Response example
+//
 //	{
 //		"state": 0,
 //		"result": {
@@ -45,6 +47,18 @@ type TransferResponse struct {
 // Transfer funds from your business wallet to your personal wallet
 //
 // See "Transfer to personal wallet" https://doc.cryptomus.com/business/payouts/transfer-to-personal
+//
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"user_wallet_transaction_uuid": "26109ba0-b05b-4ee0-93d1-fd62c822ce95",
+//			"user_wallet_balance": "15.00000000",
+//			"merchant_transaction_uuid": "95bfcabb-a0ab-48f1-80b3-ce3bc2dbb653",
+//			"merchant_balance": "20.00000000"
+//		}
+//	}
 //
 // # Possible errors
 //
@@ -144,13 +158,25 @@ func (m *Merchant) TransferToPersonalWallet(request TransferRequest) (*TransferR
 	errs = append(errs, response.Errors.Currency...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error creating invoice with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil
 }
 
 // See "Transfer to business wallet" https://doc.cryptomus.com/business/payouts/transfer-to-business
+//
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"user_wallet_transaction_uuid": "26109ba0-b05b-4ee0-93d1-fd62c822ce95",
+//			"user_wallet_balance": "15.00000000",
+//			"merchant_transaction_uuid": "95bfcabb-a0ab-48f1-80b3-ce3bc2dbb653",
+//			"merchant_balance": "20.00000000"
+//		}
+//	}
 //
 // # Possible errors
 //
@@ -223,7 +249,7 @@ func (m *Merchant) TransferToPersonalWallet(request TransferRequest) (*TransferR
 //		"error": null
 //	}
 func (m *Merchant) TransferToBusinessWallet(request TransferRequest) (*TransferResponse, error) {
-	httpResponse, err := m.sendPayoutRequest("POST", urlCreateInvoice, request)
+	httpResponse, err := m.sendPayoutRequest("POST", urlTransferToBusinessWallet, request)
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +283,7 @@ func (m *Merchant) TransferToBusinessWallet(request TransferRequest) (*TransferR
 	errs = append(errs, response.Errors.Currency...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error creating invoice with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

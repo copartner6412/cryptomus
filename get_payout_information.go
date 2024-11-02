@@ -46,7 +46,7 @@ import (
 //		}
 //	}
 func (m *Merchant) GetPayoutInformation(request RecordID) (*Payment, error) {
-	httpResponse, err := m.sendPaymentRequest("POST", urlRefundBlockedAddress, request)
+	httpResponse, err := m.sendPayoutRequest("POST", urlGetPayoutInformation, request)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +79,7 @@ func (m *Merchant) GetPayoutInformation(request RecordID) (*Payment, error) {
 	errs = append(errs, response.Errors.OrderID...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error getting payout information with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

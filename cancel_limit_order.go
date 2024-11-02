@@ -31,7 +31,7 @@ import (
 func (u *User) CancelLimitOrder(orderUuid string) (*MarketOrder, error) {
 	url := fmt.Sprintf(urlCancelLimitOrder, orderUuid)
 
-	httpResponse, err := u.sendPaymentRequest("DELETE", url, struct{}{})
+	httpResponse, err := u.sendPaymentRequest("DELETE", url, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -58,7 +58,7 @@ func (u *User) CancelLimitOrder(orderUuid string) (*MarketOrder, error) {
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error cancelling limit order with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

@@ -7,6 +7,9 @@ import (
 	"strings"
 )
 
+// See "List of services" https://doc.cryptomus.com/business/payments/list-of-services
+//
+// See "List of services" https://doc.cryptomus.com/business/payouts/list-of-services
 type Service struct {
 	// Blockchain network code
 	Network string `json:"network"`
@@ -36,7 +39,7 @@ type Service struct {
 //
 // See "List of services" https://doc.cryptomus.com/business/payments/list-of-services
 func (m *Merchant) ListPaymentServices() ([]Service, error) {
-	httpResponse, err := m.sendPaymentRequest("POST", urlListPaymentServices, struct{}{})
+	httpResponse, err := m.sendPaymentRequest("POST", urlListPaymentServices, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -63,7 +66,7 @@ func (m *Merchant) ListPaymentServices() ([]Service, error) {
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error retrieving payment services with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return response.Result, nil
@@ -77,7 +80,7 @@ func (m *Merchant) ListPaymentServices() ([]Service, error) {
 //
 // See "List of services" https://doc.cryptomus.com/business/payouts/list-of-services
 func (m *Merchant) ListPayoutServices() ([]Service, error) {
-	httpResponse, err := m.sendPayoutRequest("POST", urlListPayoutServices, struct{}{})
+	httpResponse, err := m.sendPayoutRequest("POST", urlListPayoutServices, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -104,7 +107,7 @@ func (m *Merchant) ListPayoutServices() ([]Service, error) {
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error retrieving payout services with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return response.Result, nil

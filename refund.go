@@ -135,7 +135,7 @@ func (m *Merchant) Refund(request RefundRequest) error {
 	errs = append(errs, response.Errors.Address...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return fmt.Errorf("error processing refund with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return nil

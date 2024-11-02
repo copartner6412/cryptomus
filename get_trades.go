@@ -31,26 +31,26 @@ type Trade struct {
 // # Example response
 //
 //	{
-//		"state": 0,
-//		"result": [
-//		  {
-//			"trade_id": "01J017Q6B3JGHZRP9D2NZHVKFX",
-//			"price": "59498.63487492",
-//			"base_volume": "94.00784310",
-//			"quote_volume": "0.00158000",
-//			"timestamp": 1718028573,
-//			"type": "sell"
-//		  },
-//		  {
-//			"trade_id": "01J017Q4CR4FEQ535GBWEBXZPR",
-//			"price": "59480.45000999",
-//			"base_volume": "11.68433959",
-//			"quote_volume": "0.00019644",
-//			"timestamp": 1718028571,
-//			"type": "sell"
-//		  }
-//		]
-//	  }
+//	  "data": [
+//	    {
+//	      "trade_id": "01JBP2KQ3VMKX8JSV3R0DCJ71Q",
+//	      "price": "68928.9500000000000000",
+//	      "base_volume": "64.9999998500000000",
+//	      "quote_volume": "0.0009430000000000",
+//	      "timestamp": 1730539019,
+//	      "type": "sell"
+//	    },
+//	    {
+//	      "trade_id": "01JBP00NCHWPH51YSS6TRK26H7",
+//	      "price": null,
+//	      "base_volume": null,
+//	      "quote_volume": "0.2909080000000000",
+//	      "timestamp": 1730536297,
+//	      "type": "sell"
+//	    },
+//		...
+//	  ]
+//	}
 func GetTrades(currencyPair string) ([]Trade, error) {
 	url := fmt.Sprintf(urlGetTrades, currencyPair)
 
@@ -61,17 +61,18 @@ func GetTrades(currencyPair string) ([]Trade, error) {
 	defer response.Body.Close()
 
 	var responseStruct struct {
-		State  int     `json:"state"`
-		Result []Trade `json:"result"`
+		Data []Trade `json:"data"`
+		Code int `json:"code"`
+		Message string `json:"message"`
 	}
 
 	if err := json.NewDecoder(response.Body).Decode(&responseStruct); err != nil {
 		return nil, fmt.Errorf("error decoding response payload: %w", err)
 	}
 
-	if response.StatusCode != http.StatusOK || responseStruct.State != 0 {
-		return nil, fmt.Errorf("error fetching trades with status %s", response.Status)
+	if response.StatusCode != http.StatusOK || responseStruct.Message != "" {
+		return nil, fmt.Errorf("error with status %s: %s", response.Status, responseStruct.Message)
 	}
 
-	return responseStruct.Result, nil
+	return responseStruct.Data, nil
 }

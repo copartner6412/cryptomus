@@ -9,7 +9,7 @@ import (
 
 // See "Set discount to payment method" https://doc.cryptomus.com/business/discount/set
 //
-// # Example
+// # Response example
 //
 //	{
 //	    "state": 0,
@@ -78,7 +78,7 @@ func (m *Merchant) ListDiscounts() ([]Discount, error) {
 	}
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error listing discounts with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return response.Result, nil

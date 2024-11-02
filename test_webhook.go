@@ -113,8 +113,12 @@ func (m *Merchant) TestWebhookPayment(request TestWebhookRequest) error {
 		State   int    `json:"state"`
 		Message string `json:"message"`
 		Errors  struct {
-			UUID    []string `json:"uuid"`
-			OrderID []string `json:"order_id"`
+			UUID        []string `json:"uuid"`
+			OrderID     []string `json:"order_id"`
+			Currency    []string `json:"currency"`
+			URLCallback []string `json:"url_callback"`
+			Network     []string `json:"network"`
+			Status      []string `json:"status"`
 		} `json:"errors"`
 		Code  int    `json:"code"`
 		Error string `json:"error"`
@@ -133,9 +137,13 @@ func (m *Merchant) TestWebhookPayment(request TestWebhookRequest) error {
 	}
 	errs = append(errs, response.Errors.UUID...)
 	errs = append(errs, response.Errors.OrderID...)
+	errs = append(errs, response.Errors.Currency...)
+	errs = append(errs, response.Errors.URLCallback...)
+	errs = append(errs, response.Errors.Network...)
+	errs = append(errs, response.Errors.Status...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return fmt.Errorf("error testing webhook with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return nil
@@ -186,8 +194,12 @@ func (m *Merchant) TestWebhookWallet(request TestWebhookRequest) error {
 		State   int    `json:"state"`
 		Message string `json:"message"`
 		Errors  struct {
-			UUID    []string `json:"uuid"`
-			OrderID []string `json:"order_id"`
+			UUID        []string `json:"uuid"`
+			OrderID     []string `json:"order_id"`
+			Currency    []string `json:"currency"`
+			URLCallback []string `json:"url_callback"`
+			Network     []string `json:"network"`
+			Status      []string `json:"status"`
 		} `json:"errors"`
 		Code  int    `json:"code"`
 		Error string `json:"error"`
@@ -206,9 +218,13 @@ func (m *Merchant) TestWebhookWallet(request TestWebhookRequest) error {
 	}
 	errs = append(errs, response.Errors.UUID...)
 	errs = append(errs, response.Errors.OrderID...)
+	errs = append(errs, response.Errors.Currency...)
+	errs = append(errs, response.Errors.URLCallback...)
+	errs = append(errs, response.Errors.Network...)
+	errs = append(errs, response.Errors.Status...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return fmt.Errorf("error testing wallet webhook with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return nil
@@ -266,8 +282,12 @@ func (m *Merchant) TestWebhookPayout(request TestWebhookRequest) error {
 		State   int    `json:"state"`
 		Message string `json:"message"`
 		Errors  struct {
-			UUID    []string `json:"uuid"`
-			OrderID []string `json:"order_id"`
+			UUID        []string `json:"uuid"`
+			OrderID     []string `json:"order_id"`
+			Currency    []string `json:"currency"`
+			URLCallback []string `json:"url_callback"`
+			Network     []string `json:"network"`
+			Status      []string `json:"status"`
 		} `json:"errors"`
 		Code  int    `json:"code"`
 		Error string `json:"error"`
@@ -286,9 +306,13 @@ func (m *Merchant) TestWebhookPayout(request TestWebhookRequest) error {
 	}
 	errs = append(errs, response.Errors.UUID...)
 	errs = append(errs, response.Errors.OrderID...)
+	errs = append(errs, response.Errors.Currency...)
+	errs = append(errs, response.Errors.URLCallback...)
+	errs = append(errs, response.Errors.Network...)
+	errs = append(errs, response.Errors.Status...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return fmt.Errorf("error testing payout webhook with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return nil

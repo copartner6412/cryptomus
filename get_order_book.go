@@ -57,27 +57,48 @@ func GetOrderBook(currencyPair string, level int) (timestamp time.Time, bids, as
 	defer response.Body.Close()
 
 	var responseStruct struct {
-		State  int `json:"state"`
-		Result struct {
+		Data struct {
 			Timestamp string  `json:"timestamp"`
 			Bids      []Order `json:"bids"`
 			Asks      []Order `json:"asks"`
-		} `json:"result"`
+		} `json:"data"`
+		Code  int `json:"code"`
+		Message string `json:"message"`
+		Errors []struct {
+			Property string `json:"property"`
+			Value    string `json:"value"`
+			Message  string `json:"message"`
+		} `json:"errors"`
+		Error string `json:"error"`
 	}
 	if err := json.NewDecoder(response.Body).Decode(&responseStruct); err != nil {
 		return time.Time{}, nil, nil, fmt.Errorf("error decoding response payload: %w", err)
 	}
 
-	if response.StatusCode != http.StatusOK || responseStruct.State != 0 {
-		return time.Time{}, nil, nil, fmt.Errorf("error fetching order book with status %s", response.Status)
+	var errs []string
+	if responseStruct.Message != "" {
+		errs = append(errs, responseStruct.Message)
+	}
+	if len(responseStruct.Errors) >0 {
+		for _, err := range responseStruct.Errors{
+			errString := fmt.Sprintf("property: %s, value: %s, message: %s", err.Property, err.Value, err.Message)
+			errs = append(errs, errString)
+		}
+	}
+	if responseStruct.Error != "" {
+		errs = append(errs, responseStruct.Error)
 	}
 
-	timestamp, err = parseUnixTimeString(responseStruct.Result.Timestamp)
+	if response.StatusCode != http.StatusOK || len(errs) > 0 {
+		return time.Time{}, nil, nil, fmt.Errorf("error with status %s: %s", response.Status, strings.Join(errs, "; "))
+	}
+
+	timestamp, err = parseUnixTimeString(responseStruct.Data.Timestamp)
 	if err != nil {
 		return time.Time{}, nil, nil, fmt.Errorf("error converting timestamp: %w", err)
 	}
 
-	return timestamp, responseStruct.Result.Bids, responseStruct.Result.Asks, nil
+	return timestamp, responseStruct.Data.Bids, responseStruct.Data.Asks, nil
 }
 
 func parseUnixTimeString(unixDecimal string) (time.Time, error) {

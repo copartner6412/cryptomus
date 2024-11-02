@@ -26,6 +26,36 @@ import (
 //
 // See "Creating an invoice" https://doc.cryptomus.com/business/payments/creating-invoice
 //
+// # Payment example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"uuid": "26109ba0-b05b-4ee0-93d1-fd62c822ce95",
+//			"order_id": "1",
+//			"amount": "15.00",
+//			"payment_amount": null,
+//			"payer_amount": null,
+//			"discount_percent": null,
+//			"discount": "0.00000000",
+//			"payer_currency": null,
+//			"currency": "USD",
+//			"merchant_amount": null,
+//			"network": null,
+//			"address": null,
+//			"from": null,
+//			"txid": null,
+//			"payment_status": "check",
+//			"url": "https://pay.cryptomus.com/pay/26109ba0-b05b-4ee0-93d1-fd62c822ce95",
+//			"expired_at": 1689098133,
+//			"status": "check",
+//			"is_final": false,
+//			"additional_data": null,
+//			"created_at": "2023-07-11T20:23:52+03:00",
+//			"updated_at": "2023-07-11T21:24:17+03:00"
+//		}
+//	}
+//
 // # Possible errors
 //
 // # Validation errors
@@ -136,9 +166,9 @@ func (m *Merchant) CreateInvoice(request Invoice) (*Payment, error) {
 		Message string  `json:"message"`
 		// If some parameter is required and not passed
 		Errors struct {
-			UUID    []string `json:"uuid"`
-			OrderID []string `json:"order_id"`
-			Amount  []string `json:"amount"`
+			Amount   []string `json:"amount"`
+			Currency []string `json:"currency"`
+			OrderID  []string `json:"order_id"`
 		} `json:"errors"`
 		Code  int    `json:"code"`
 		Error string `json:"error"`
@@ -155,12 +185,12 @@ func (m *Merchant) CreateInvoice(request Invoice) (*Payment, error) {
 	if response.Error != "" {
 		errs = append(errs, response.Error)
 	}
-	errs = append(errs, response.Errors.UUID...)
-	errs = append(errs, response.Errors.OrderID...)
 	errs = append(errs, response.Errors.Amount...)
+	errs = append(errs, response.Errors.Currency...)
+	errs = append(errs, response.Errors.OrderID...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error creating invoice with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

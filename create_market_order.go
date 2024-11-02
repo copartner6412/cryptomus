@@ -52,7 +52,7 @@ type MarketOrderRequest struct {
 //		}
 //	}
 func (u *User) CreateMarketOrder(request MarketOrderRequest) (*MarketOrder, error) {
-	httpResponse, err := u.sendPaymentRequest("POST", urlCreateMarketOrder, struct{}{})
+	httpResponse, err := u.sendPaymentRequest("POST", urlCreateMarketOrder, request)
 	if err != nil {
 		return nil, err
 	}
@@ -87,7 +87,7 @@ func (u *User) CreateMarketOrder(request MarketOrderRequest) (*MarketOrder, erro
 	errs = append(errs, response.Errors.Amount...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error creating market order with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

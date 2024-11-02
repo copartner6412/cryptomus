@@ -11,6 +11,37 @@ import (
 //
 // See "Payment information" https://doc.cryptomus.com/business/payments/payment-information
 //
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"uuid": "70b8db5c-b952-406d-af26-4e1c34c27f15",
+//			"order_id": "65bbe87b4098c17a31cff3e71e515243",
+//			"amount": "15.00",
+//			"payment_amount": "0.00",
+//			"payer_amount": "15.75",
+//			"discount_percent": -5,
+//			"discount": "-0.75",
+//			"payer_currency": "USDT",
+//			"currency": "USDT",
+//			"comments": null,
+//			"merchant_amount": "15.43500000",
+//			"network": "tron",
+//			"address": "TXhfYSWt2oKRrHAJVJeYRuit6ZzKuoEKXj",
+//			"from": null,
+//			"txid": null,
+//			"payment_status": "cancel",
+//			"url": "https://pay.cryptomus.com/pay/70b8db5c-b952-406d-af26-4e1c34c27f15",
+//			"expired_at": 1689099831,
+//			"status": "cancel",
+//			"is_final": true,
+//			"additional_data": null,
+//			"created_at": "2023-07-11T20:23:52+03:00",
+//			"updated_at": "2023-07-11T21:24:17+03:00"
+//		}
+//	}
+//
 // # Possible errors
 //
 // code : 422
@@ -58,7 +89,7 @@ func (m *Merchant) GetPaymentInformation(request RecordID) (*Payment, error) {
 	errs = append(errs, response.Errors.OrderID...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error getting payment information with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

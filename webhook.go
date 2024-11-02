@@ -133,6 +133,7 @@ type Update struct {
 	Sign string `json:"sign"`
 }
 
+// See "Webhook" https://doc.cryptomus.com/business/payments/webhook
 type AutomaticConvert struct {
 	// The currency code to which the payment will be converted
 	ToCurrency *string `json:"to_currency"`

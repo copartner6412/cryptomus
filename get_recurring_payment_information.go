@@ -11,6 +11,27 @@ import (
 //
 // See "Payment information" https://doc.cryptomus.com/business/recurring/info
 //
+// # Response example
+//
+//	{
+//		"state": 0,
+//		"result": {
+//			"uuid": "afd050e8-35ea-4129-bbdd-73f510dce556",
+//			"name": "Recurring payment",
+//			"order_id": null,
+//			"amount": "15",
+//			"currency": "USDT",
+//			"payer_currency": "USDT",
+//			"payer_amount_usd": "15.00",
+//			"payer_amount": "15.00000000",
+//			"url_callback": null,
+//			"period": "monthly",
+//			"status": "wait_accept",
+//			"url": "https://pay.cryptomus.com/recurring/afd050e8-35ea-4129-bbdd-73f510dce556",
+//			"last_pay_off": null
+//		}
+//	}
+//
 // # Possible errors
 //
 // # Validation errors
@@ -62,7 +83,7 @@ func (m *Merchant) GetRecurringPaymentInformation(request RecordID) (*RecurringP
 	errs = append(errs, response.Errors.OrderID...)
 
 	if httpResponse.StatusCode != http.StatusOK || response.State != 0 || len(errs) > 0 {
-		return nil, fmt.Errorf("error getting recurring payment information with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
+		return nil, fmt.Errorf("error with status %s: %v", httpResponse.Status, strings.Join(errs, "; "))
 	}
 
 	return &response.Result, nil

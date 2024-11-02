@@ -6,6 +6,7 @@ package cryptomus
 //
 // See "Payout history" https://doc.cryptomus.com/business/payouts/payout-history
 //
+// # Response example
 //	{
 //	    "state": 0,
 //	    "result": {
