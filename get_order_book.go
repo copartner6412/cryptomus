@@ -62,9 +62,9 @@ func GetOrderBook(currencyPair string, level int) (timestamp time.Time, bids, as
 			Bids      []Order `json:"bids"`
 			Asks      []Order `json:"asks"`
 		} `json:"data"`
-		Code  int `json:"code"`
+		Code    int    `json:"code"`
 		Message string `json:"message"`
-		Errors []struct {
+		Errors  []struct {
 			Property string `json:"property"`
 			Value    string `json:"value"`
 			Message  string `json:"message"`
@@ -79,8 +79,8 @@ func GetOrderBook(currencyPair string, level int) (timestamp time.Time, bids, as
 	if responseStruct.Message != "" {
 		errs = append(errs, responseStruct.Message)
 	}
-	if len(responseStruct.Errors) >0 {
-		for _, err := range responseStruct.Errors{
+	if len(responseStruct.Errors) > 0 {
+		for _, err := range responseStruct.Errors {
 			errString := fmt.Sprintf("property: %s, value: %s, message: %s", err.Property, err.Value, err.Message)
 			errs = append(errs, errString)
 		}

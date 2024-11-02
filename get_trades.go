@@ -61,9 +61,9 @@ func GetTrades(currencyPair string) ([]Trade, error) {
 	defer response.Body.Close()
 
 	var responseStruct struct {
-		Data []Trade `json:"data"`
-		Code int `json:"code"`
-		Message string `json:"message"`
+		Data    []Trade `json:"data"`
+		Code    int     `json:"code"`
+		Message string  `json:"message"`
 	}
 
 	if err := json.NewDecoder(response.Body).Decode(&responseStruct); err != nil {

@@ -728,7 +728,6 @@ type listOrdersResponse struct {
 	Paginate paginate      `json:"Paginate"`
 }
 
-
 // Available options for type:
 //   - market
 //   - limit
@@ -785,7 +784,6 @@ func (u *User) nextOrderHistoryPage(cursor, orderType, orderStatus string) (*lis
 	return &response.Result, nil
 
 }
-
 
 // See "Get orders list" https://doc.cryptomus.com/personal/converts/orders-list
 //

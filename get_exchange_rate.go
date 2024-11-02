@@ -9,9 +9,9 @@ import (
 // See "List" https://doc.cryptomus.com/business/exchange-rates/list
 type ExchangeRate struct {
 	// From currency
-	From   string `json:"from"`
+	From string `json:"from"`
 	// To currency
-	To     string `json:"to"`
+	To string `json:"to"`
 	// Exchange rate
 	Course string `json:"course"`
 }
